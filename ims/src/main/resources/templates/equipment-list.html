@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Airtel Inventory - Equipment List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        
+        .container {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 12px 25px;
+        }
+        
+        .sidebar-menu li a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .sidebar-menu li.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .sidebar-menu li.active a {
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .status-available {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-assigned {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .status-maintenance {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li class="active"><a href="/equipment">📱 Equipment</a></li>
+                <li><a href="/assignments">📋 Assignments</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li th:if="${currentUser.role == 'ADMIN'}"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h2>Equipment Management</h2>
+                <a href="/equipment/add" class="btn btn-primary">+ Add Equipment</a>
+            </div>
+            
+            <div th:if="${message}" class="alert" th:classappend="'alert-' + ${messageType}">
+                <span th:text="${message}"></span>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Asset Tag</th>
+                        <th>Device Type</th>
+                        <th>Brand</th>
+                        <th>Model</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="equip : ${equipmentList}">
+                        <td th:text="${equip.assetTag}"></td>
+                        <td th:text="${equip.deviceType}"></td>
+                        <td th:text="${equip.brand}"></td>
+                        <td th:text="${equip.model}"></td>
+                        <td>
+                            <span class="status" 
+                                  th:classappend="${equip.status.name() == 'AVAILABLE' ? 'status-available' : (equip.status.name() == 'ASSIGNED' ? 'status-assigned' : 'status-maintenance')}"
+                                  th:text="${equip.status.displayName}"></span>
+                        </td>
+                        <td class="action-buttons">
+                            <a th:href="@{/equipment/edit/{id}(id=${equip.id})}" class="btn btn-warning btn-sm">Edit</a>
+                            <a th:href="@{/equipment/delete/{id}(id=${equip.id})}" class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${equipmentList.isEmpty()}">
+                        <td colspan="6" style="text-align: center;">No equipment found. Click "Add Equipment" to get started.</td>
+                     </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

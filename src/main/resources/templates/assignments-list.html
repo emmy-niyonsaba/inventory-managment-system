@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtel Inventory - Assignments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        
+        .container {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 12px 25px;
+        }
+        
+        .sidebar-menu li a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .sidebar-menu li.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .sidebar-menu li.active a {
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .section-title {
+            margin: 20px 0 15px 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .badge-active {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .badge-overdue {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .badge-returned {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+        
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/equipment">📱 Equipment</a></li>
+                <li class="active"><a href="/assignments">📋 Assignments</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li th:if="${currentUser.role == 'ADMIN'}"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h2>Equipment Assignments</h2>
+                <a href="/equipment" class="btn btn-primary">+ Assign Equipment</a>
+            </div>
+            
+            <div th:if="${message}" class="alert" th:classappend="'alert-' + ${messageType}">
+                <span th:text="${message}"></span>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('active-tab')">Active Assignments</button>
+                <button class="tab" onclick="showTab('overdue-tab')">Overdue</button>
+                <button class="tab" onclick="showTab('all-tab')">All Assignments</button>
+            </div>
+            
+            <!-- Active Assignments Tab -->
+            <div id="active-tab" class="tab-content active">
+                <div class="section-title">
+                    <span>📋 Currently Active Assignments</span>
+                    <span class="badge badge-active" th:text="'(' + ${activeAssignments.size()} + ')'"></span>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Equipment</th>
+                            <th>Assigned To</th>
+                            <th>Department</th>
+                            <th>Assigned Date</th>
+                            <th>Expected Return</th>
+                            <th>Purpose</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="assignment : ${activeAssignments}">
+                            <td th:text="${assignment.equipment.assetTag}"></td>
+                            <td th:text="${assignment.equipment.brand} + ' ' + ${assignment.equipment.model}"></td>
+                            <td th:text="${assignment.assignedUser.fullName}"></td>
+                            <td th:text="${assignment.assignedToDepartment}"></td>
+                            <td th:text="${#dates.format(assignment.assignedDate, 'dd-MM-yyyy')}"></td>
+                            <td th:text="${#dates.format(assignment.expectedReturnDate, 'dd-MM-yyyy')}"></td>
+                            <td th:text="${assignment.purpose}"></td>
+                            <td class="action-buttons">
+                                <a th:href="@{/assignments/return/{id}(id=${assignment.id})}" class="btn btn-success btn-sm">Return</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${activeAssignments.isEmpty()}">
+                            <td colspan="8" style="text-align: center;">No active assignments</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Overdue Assignments Tab -->
+            <div id="overdue-tab" class="tab-content">
+                <div class="section-title">
+                    <span>⚠️ Overdue Assignments</span>
+                    <span class="badge badge-overdue" th:text="'(' + ${overdueAssignments.size()} + ')'"></span>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Equipment</th>
+                            <th>Assigned To</th>
+                            <th>Department</th>
+                            <th>Assigned Date</th>
+                            <th>Expected Return</th>
+                            <th>Days Overdue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="assignment : ${overdueAssignments}">
+                            <td th:text="${assignment.equipment.assetTag}"></td>
+                            <td th:text="${assignment.equipment.brand} + ' ' + ${assignment.equipment.model}"></td>
+                            <td th:text="${assignment.assignedUser.fullName}"></td>
+                            <td th:text="${assignment.assignedToDepartment}"></td>
+                            <td th:text="${#dates.format(assignment.assignedDate, 'dd-MM-yyyy')}"></td>
+                            <td th:text="${#dates.format(assignment.expectedReturnDate, 'dd-MM-yyyy')}"></td>
+                            <td style="color: red;">Overdue</td>
+                            <td class="action-buttons">
+                                <a th:href="@{/assignments/return/{id}(id=${assignment.id})}" class="btn btn-warning btn-sm">Return</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${overdueAssignments.isEmpty()}">
+                            <td colspan="8" style="text-align: center;">No overdue assignments</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- All Assignments Tab -->
+            <div id="all-tab" class="tab-content">
+                <div class="section-title">
+                    <span>📜 All Assignment History</span>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset Tag</th>
+                            <th>Equipment</th>
+                            <th>Assigned To</th>
+                            <th>Assigned Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="assignment : ${allAssignments}">
+                            <td th:text="${assignment.equipment.assetTag}"></td>
+                            <td th:text="${assignment.equipment.brand} + ' ' + ${assignment.equipment.model}"></td>
+                            <td th:text="${assignment.assignedUser.fullName}"></td>
+                            <td th:text="${#dates.format(assignment.assignedDate, 'dd-MM-yyyy')}"></td>
+                            <td th:text="${assignment.actualReturnDate != null ? #dates.format(assignment.actualReturnDate, 'dd-MM-yyyy') : '-'}"></td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${assignment.status == 'ACTIVE' ? 'badge-active' : (assignment.status == 'OVERDUE' ? 'badge-overdue' : 'badge-returned')}"
+                                      th:text="${assignment.status}"></span>
+                            </td>
+                        </tr>
+                        <tr th:if="${allAssignments.isEmpty()}">
+                            <td colspan="6" style="text-align: center;">No assignments found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

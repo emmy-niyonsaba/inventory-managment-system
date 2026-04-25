@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Equipment - Airtel Inventory</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+        .container { display: flex; }
+        .sidebar { width: 250px; background: white; height: calc(100vh - 60px); }
+        .sidebar-menu { list-style: none; padding: 20px 0; }
+        .sidebar-menu li { padding: 12px 25px; }
+        .sidebar-menu li a { text-decoration: none; color: #333; }
+        .sidebar-menu li.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .sidebar-menu li.active a { color: white; }
+        .main-content { flex: 1; padding: 30px; }
+        .form-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 800px; }
+        .form-title { margin-bottom: 25px; color: #333; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; font-size: 14px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-secondary { background: #a0aec0; color: white; }
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        .required:after { content: " *"; color: red; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li class="active"><a href="/equipment">📱 Equipment</a></li>
+                <li><a href="/assignments">📋 Assignments</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li th:if="${currentUser.role == 'ADMIN'}"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-container">
+                <h2 class="form-title">Add New Equipment</h2>
+                
+                <form action="/equipment/add" method="post">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Asset Tag</label>
+                            <input type="text" name="assetTag" required placeholder="e.g., AIR-LAP-001">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required">Device Type</label>
+                            <select name="deviceType" required>
+                                <option value="">Select Device Type</option>
+                                <option value="LAPTOP">Laptop</option>
+                                <option value="DESKTOP">Desktop</option>
+                                <option value="MOBILE">Mobile Phone</option>
+                                <option value="TABLET">Tablet</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">Brand</label>
+                            <input type="text" name="brand" required placeholder="e.g., Dell, HP, Apple">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required">Model</label>
+                            <input type="text" name="model" required placeholder="e.g., XPS 15, EliteBook">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Serial Number</label>
+                            <input type="text" name="serialNumber" placeholder="Unique serial number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select name="status">
+                                <option value="AVAILABLE">Available</option>
+                                <option value="ASSIGNED">Assigned</option>
+                                <option value="UNDER_MAINTENANCE">Under Maintenance</option>
+                                <option value="DAMAGED">Damaged</option>
+                                <option value="DISPOSED">Disposed</option>
+                                <option value="LOST">Lost</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Specifications</label>
+                        <textarea name="specifications" placeholder="RAM: 16GB, Storage: 512GB SSD, Processor: Intel i7..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Condition</label>
+                            <select name="equipmentCondition">
+                                <option value="">Select Condition</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                                <option value="Damaged">Damaged</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Purchase Date</label>
+                            <input type="date" name="purchaseDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" placeholder="Additional notes about this equipment..."></textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Save Equipment</button>
+                        <a href="/equipment" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

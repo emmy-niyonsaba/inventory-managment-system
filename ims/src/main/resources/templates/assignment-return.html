@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtel Inventory - Return Equipment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        
+        .container {
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 12px 25px;
+        }
+        
+        .sidebar-menu li a {
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .sidebar-menu li.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .sidebar-menu li.active a {
+            color: white;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 700px;
+        }
+        
+        .form-title {
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .assignment-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ed8936;
+        }
+        
+        .assignment-info h4 {
+            margin-bottom: 10px;
+            color: #ed8936;
+        }
+        
+        .assignment-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .required:after {
+            content: " *";
+            color: red;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .warning-box {
+            background: #fef5e7;
+            border: 1px solid #f39c12;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/equipment">📱 Equipment</a></li>
+                <li class="active"><a href="/assignments">📋 Assignments</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li th:if="${currentUser.role == 'ADMIN'}"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <a href="/assignments" class="back-link">← Back to Assignments</a>
+            
+            <div class="form-container">
+                <h2 class="form-title">Return Equipment</h2>
+                
+                <div class="assignment-info">
+                    <h4>📋 Assignment Details</h4>
+                    <div class="info-grid">
+                        <p><strong>Asset Tag:</strong> <span th:text="${assignment.equipment.assetTag}"></span></p>
+                        <p><strong>Equipment:</strong> <span th:text="${assignment.equipment.brand} + ' ' + ${assignment.equipment.model}"></span></p>
+                        <p><strong>Assigned To:</strong> <span th:text="${assignment.assignedUser.fullName}"></span></p>
+                        <p><strong>Department:</strong> <span th:text="${assignment.assignedToDepartment}"></span></p>
+                        <p><strong>Assigned Date:</strong> <span th:text="${#dates.format(assignment.assignedDate, 'dd-MM-yyyy')}"></span></p>
+                        <p><strong>Expected Return:</strong> <span th:text="${#dates.format(assignment.expectedReturnDate, 'dd-MM-yyyy')}"></span></p>
+                    </div>
+                </div>
+                
+                <div class="warning-box" th:if="${assignment.expectedReturnDate != null && assignment.expectedReturnDate.isBefore(#dates.createNow())}">
+                    ⚠️ This assignment is OVERDUE! Please process the return immediately.
+                </div>
+                
+                <form action="/assignments/return" method="post">
+                    <input type="hidden" name="assignmentId" th:value="${assignment.id}">
+                    
+                    <div class="form-group">
+                        <label class="required">Condition at Return</label>
+                        <select name="conditionAtReturn" required>
+                            <option value="">Select Condition</option>
+                            <option value="Excellent">Excellent - Like new, no issues</option>
+                            <option value="Good">Good - Minor wear and tear</option>
+                            <option value="Fair">Fair - Visible wear, functional</option>
+                            <option value="Poor">Poor - Needs repair/maintenance</option>
+                            <option value="Damaged">Damaged - Not functional</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Return Notes</label>
+                        <textarea name="notes" placeholder="Any additional notes about the return, damages, or issues observed..."></textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Confirm Return</button>
+                        <a href="/assignments" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

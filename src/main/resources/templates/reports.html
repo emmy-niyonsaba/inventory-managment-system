@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtel Inventory - Reports</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+        .container { display: flex; }
+        .sidebar { width: 250px; background: white; height: calc(100vh - 60px); }
+        .sidebar-menu { list-style: none; padding: 20px 0; }
+        .sidebar-menu li { padding: 12px 25px; }
+        .sidebar-menu li a { text-decoration: none; color: #333; }
+        .sidebar-menu li.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .sidebar-menu li.active a { color: white; }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .header { margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .stat-number { font-size: 32px; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; margin-top: 8px; }
+        .report-section { background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 30px; }
+        .report-section h3 { margin-bottom: 20px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: bold; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .export-buttons { display: flex; gap: 15px; margin-top: 20px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-available { background: #c6f6d5; color: #22543d; }
+        .badge-assigned { background: #bee3f8; color: #2c5282; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/equipment">📱 Equipment</a></li>
+                <li><a href="/assignments">📋 Assignments</a></li>
+                <li class="active"><a href="/reports">📊 Reports</a></li>
+                <li th:if="${currentUser.role == 'ADMIN'}"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h2>📊 Reports & Analytics</h2>
+                <p>View equipment statistics and generate reports</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number" th:text="${totalEquipment}">0</div><div class="stat-label">Total Equipment</div></div>
+                <div class="stat-card"><div class="stat-number" th:text="${availableEquipment}">0</div><div class="stat-label">Available</div></div>
+                <div class="stat-card"><div class="stat-number" th:text="${assignedEquipment}">0</div><div class="stat-label">Assigned</div></div>
+                <div class="stat-card"><div class="stat-number" th:text="${underMaintenance}">0</div><div class="stat-label">Under Maintenance</div></div>
+                <div class="stat-card"><div class="stat-number" th:text="${damagedEquipment}">0</div><div class="stat-label">Damaged</div></div>
+            </div>
+            
+            <div class="report-section">
+                <h3>📱 Equipment by Device Type</h3>
+                <table>
+                    <thead><tr><th>Device Type</th><th>Count</th></tr></thead>
+                    <tbody>
+                        <tr th:each="stat : ${deviceTypeStats}"><td th:text="${stat[0]}"></td><td th:text="${stat[1]}"></td></tr>
+                        <tr th:if="${deviceTypeStats.isEmpty()}"><td colspan="2">No data available</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="report-section">
+                <h3>📊 Equipment by Status</h3>
+                <table>
+                    <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                    <tbody>
+                        <tr th:each="stat : ${statusStats}"><td><span class="badge" th:classappend="'badge-' + ${stat[0].toString().toLowerCase()}" th:text="${stat[0]}"></span></td><td th:text="${stat[1]}"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="report-section">
+                <h3>🏢 Assignments by Department</h3>
+                <table>
+                    <thead><tr><th>Department</th><th>Active Assignments</th></tr></thead>
+                    <tbody>
+                        <tr th:each="stat : ${deptAssignments}"><td th:text="${stat[0]}"></td><td th:text="${stat[1]}"></td></tr>
+                        <tr th:if="${deptAssignments.isEmpty()}"><td colspan="2">No active assignments</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="export-buttons">
+                <a href="/reports/export?type=equipment" class="btn btn-primary">📄 Export Equipment Report</a>
+                <a href="/reports/export?type=assignments" class="btn btn-success">📄 Export Assignments Report</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

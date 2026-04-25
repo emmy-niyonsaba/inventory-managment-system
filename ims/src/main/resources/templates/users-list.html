@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users - Airtel Inventory</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .logout-btn { background: rgba(255,255,255,0.2); color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+        .container { display: flex; }
+        .sidebar { width: 250px; background: white; height: calc(100vh - 60px); }
+        .sidebar-menu { list-style: none; padding: 20px 0; }
+        .sidebar-menu li { padding: 12px 25px; }
+        .sidebar-menu li a { text-decoration: none; color: #333; }
+        .sidebar-menu li.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .sidebar-menu li.active a { color: white; }
+        .main-content { flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #667eea; color: white; }
+        table { width: 100%; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: bold; }
+        .badge-admin { background: #667eea; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-manager { background: #48bb78; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-user { background: #a0aec0; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #c6f6d5; color: #22543d; }
+        .alert-error { background: #fed7d7; color: #742a2a; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🏢 Airtel Inventory Management System</h2>
+        <div class="user-info">
+            <span th:text="${currentUser.fullName}"></span>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="/dashboard">🏠 Dashboard</a></li>
+                <li><a href="/equipment">📱 Equipment</a></li>
+                <li><a href="/assignments">📋 Assignments</a></li>
+                <li><a href="/reports">📊 Reports</a></li>
+                <li class="active"><a href="/users">👥 Users</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h2>User Management</h2>
+                <a href="/users/add" class="btn btn-primary">+ Add User</a>
+            </div>
+            
+            <div th:if="${message}" class="alert" th:classappend="'alert-' + ${messageType}">
+                <span th:text="${message}"></span>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.username}">-</td>
+                        <td th:text="${user.fullName}">-</td>
+                        <td th:text="${user.department}">-</td>
+                        <td th:text="${user.email}">-</td>
+                        <td>
+                            <span class="badge-admin" th:if="${user.role == 'ADMIN'}" th:text="${user.role}">ADMIN</span>
+                            <span class="badge-manager" th:if="${user.role == 'MANAGER'}" th:text="${user.role}">MANAGER</span>
+                            <span class="badge-user" th:if="${user.role == 'USER'}" th:text="${user.role}">USER</span>
+                        </td>
+                        <td>
+                            <span th:if="${user.active}">Active</span>
+                            <span th:unless="${user.active}">Inactive</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${users.empty}">
+                        <td colspan="6" style="text-align: center;">No users found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
