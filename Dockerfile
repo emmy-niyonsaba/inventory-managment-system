@@ -1,12 +1,21 @@
-# Build stage
-FROM maven:3.8.1-openjdk-17 AS builder
+# Step 1: Build stage
+FROM maven:3.9.6-eclipse-temurin-17 AS build
+
 WORKDIR /app
 COPY . .
+
 RUN mvn clean package -DskipTests
 
-# Runtime stage
-FROM eclipse-temurin:17-jdk-jammy
+# Step 2: Run stage
+FROM eclipse-temurin:17-jdk-alpine
+
 WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
+
+# Copy jar from build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port (Render uses 8080 by default)
 EXPOSE 8080
-CMD ["java", "-jar", "target/app.jar"]
+
+# Run app
+ENTRYPOINT ["java", "-jar", "app.jar"]
