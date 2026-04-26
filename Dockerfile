@@ -7,6 +7,6 @@ RUN mvn clean package -DskipTests
 # Runtime stage
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=builder /app/ims/target/ims-1.0.0.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
